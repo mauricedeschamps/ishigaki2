@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
     <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
-    <!-- アイコンは用意されたファイルを参照 -->
     <link rel="apple-touch-icon" href="icons/icon-192.jpg">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -73,7 +72,7 @@
             gap: 0.8rem;
             align-items: center;
         }
-        select, .theme-toggle, .install-btn {
+        select, .theme-toggle {
             background: var(--bg-secondary);
             border: 1px solid var(--border);
             padding: 0.4rem 0.8rem;
@@ -81,11 +80,6 @@
             color: var(--text-primary);
             font-size: 0.9rem;
             cursor: pointer;
-        }
-        .install-btn {
-            background: var(--accent);
-            color: white;
-            border: none;
         }
         .cards-grid {
             display: grid;
@@ -107,7 +101,6 @@
         }
         .card-content { padding: 1.5rem; }
         .card-title { font-size: 1.8rem; margin-bottom: 0.75rem; }
-        /* 地図を大きく */
         .map-img {
             width: 100%;
             height: 280px;
@@ -211,7 +204,6 @@
                 <option value="ja">🇯🇵 日本語</option>
             </select>
             <button class="theme-toggle" id="themeToggle">🌙</button>
-            <button class="install-btn" id="installBtn" style="display:none">📱 インストール</button>
         </div>
     </header>
     <main id="dynamicContent"></main>
@@ -227,7 +219,7 @@
 </div>
 
 <script>
-    // ======================= 多言語データ（全島情報）=======================
+    // ======================= 多言語データ =======================
     const islandsData = {
         ishigaki: { id: "ishigaki", name: { en: "Ishigaki Island", it: "Ishigaki", ru: "Исигаки", ja: "石垣島" }, mainImage: "https://ishigaki-tours.com/wp-content/uploads/2018/01/313-3.jpg", mapImage: "https://www.samuraitours.com/wp-content/uploads/2020/05/e_top_map.gif", officialLink: "https://visitokinawa.jp/", 
             desc: { en: "Gateway to the Yaeyama archipelago with stunning nature.", it: "Porta dell'arcipelago Yaeyama.", ru: "Ворота в архипелаг Яэяма.", ja: "八重山諸島の玄関口。豊かな自然と文化。" },
@@ -303,7 +295,6 @@
     let currentLang = "en";
     let currentTheme = "dark";
     let currentView = { type: 'main' };
-    let deferredPrompt = null;
 
     function t(key, islandId = null, field = null) {
         if (islandId && field && islandsData[islandId] && islandsData[islandId][field] && islandsData[islandId][field][currentLang])
@@ -317,7 +308,6 @@
         document.getElementById('themeToggle').textContent = currentTheme === 'dark' ? '🌙' : '☀️';
     }
 
-    // レンダリング関数
     function renderMainPage() {
         const ui = UI_TEXT[currentLang];
         const html = `
@@ -436,20 +426,6 @@
         else if (currentView.type === 'detail') renderDetailPage(currentView.islandId, currentView.returnToMainId);
     }
 
-    // PWA インストール処理
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        const installBtn = document.getElementById('installBtn');
-        installBtn.style.display = 'inline-block';
-        installBtn.onclick = () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then(() => { installBtn.style.display = 'none'; deferredPrompt = null; });
-            }
-        };
-    });
-
     // 初期化
     function initApp() {
         const savedLang = localStorage.getItem('appLang') || 'en';
@@ -471,11 +447,14 @@
     }
     initApp();
 
-// Service Worker 登録（絶対パス推奨）
+    // Service Worker 登録（シンプル）
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js').then(reg => console.log('SW登録済み', reg)).catch(err => console.log('SWエラー', err));
+        navigator.serviceWorker.register('/sw.js').then(reg => {
+            console.log('Service Worker 登録成功:', reg);
+        }).catch(err => {
+            console.log('Service Worker 登録失敗:', err);
+        });
     }
-
 </script>
 </body>
 </html>
