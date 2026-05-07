@@ -1,10 +1,10 @@
 const CACHE_NAME = 'island-guide-v1';
 const urlsToCache = [
   '/',
-  '/index.html',
-  '/manifest.json',
-  '/icons/icon-192.jpg',
-  '/icons/icon-512.jpg'
+  'index.html',
+  'manifest.json',
+  'icons/icon-192.jpg',
+  'icons/icon-512.jpg'
 ];
 
 self.addEventListener('install', event => {
