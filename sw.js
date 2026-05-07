@@ -23,7 +23,7 @@ self.addEventListener('fetch', event => {
       return fetch(event.request).catch(() => {
         // ナビゲーション要求ならオフラインでもメインページを表示
         if (event.request.mode === 'navigate') {
-          return caches.match('/index.html');
+          return caches.match('index.html');
         }
         return new Response('オフライン状態です', { status: 404, statusText: 'Offline' });
       });
