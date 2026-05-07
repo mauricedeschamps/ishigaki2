@@ -1,10 +1,10 @@
 const CACHE_NAME = 'yaeyama-guide-v1';
 const urlsToCache = [
   '/',
-  'index.html',
-  'manifest.json',
-  'icons/icon-192.jpg',
-  'icons/icon-512.jpg'
+  '/index.html',
+  '/manifest.json',
+  '/icons/icon-192.jpg',
+  '/icons/icon-512.jpg'
 ];
 
 self.addEventListener('install', event => {
@@ -28,7 +28,7 @@ self.addEventListener('fetch', event => {
   if (request.mode === 'navigate') {
     event.respondWith(
       fetch(request).catch(() => {
-        return caches.match('index.html');
+        return caches.match('/index.html');
       })
     );
     return;
