@@ -471,10 +471,11 @@
     }
     initApp();
 
-    // Service Worker 登録（アイコンは静的ファイル、動的生成なし）
+// Service Worker 登録（絶対パス推奨）
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js').then(reg => console.log('SW登録済み', reg)).catch(err => console.log('SWエラー', err));
+        navigator.serviceWorker.register('/sw.js').then(reg => console.log('SW登録済み', reg)).catch(err => console.log('SWエラー', err));
     }
+
 </script>
 </body>
 </html>
