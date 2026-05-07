@@ -5,10 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
     <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
+    <!-- iPhone / iOS 対応 -->
     <link rel="apple-touch-icon" href="icons/icon-192.jpg">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="島ガイド">
+    <!-- PWA manifest -->
     <link rel="manifest" href="/manifest.json">
     <title>八重山・宮古諸島ガイド</title>
     <style>
@@ -19,7 +21,7 @@
             transition: background-color 0.2s ease, color 0.2s ease;
         }
         body {
-            font-family: system-ui, 'Segoe UI', sans-serif;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
             line-height: 1.5;
@@ -140,7 +142,9 @@
             border: 1px solid var(--border);
             overflow: hidden;
             cursor: pointer;
+            transition: transform 0.1s;
         }
+        .mini-card:active { transform: scale(0.98); }
         .mini-img {
             width: 100%;
             height: 180px;
@@ -172,6 +176,7 @@
             border-top: 1px solid var(--border);
             text-align: center;
         }
+        .footer a { color: var(--accent); text-decoration: none; }
         .sponsor-area {
             background: var(--bg-secondary);
             border-radius: 1rem;
@@ -193,7 +198,7 @@
     </style>
 </head>
 <body>
-<div class="app-container" id="appRoot">
+<div class="app-container">
     <header class="main-header">
         <h1 id="mainTitle">Yaeyama & Miyako Islands Guide</h1>
         <div class="controls">
@@ -208,58 +213,59 @@
     </header>
     <main id="dynamicContent"></main>
     <footer class="footer">
-        <p>お問い合わせ: <a href="mailto:mementomorikatsu@gmail.com">mementomorikatsu@gmail.com</a></p>
+        <p>Contact us: <a href="mailto:mementomorikatsu@gmail.com">mementomorikatsu@gmail.com</a></p>
         <div class="sponsor-area">
-            <span>✨ スポンサー</span>
+            <span>✨ Supported by</span>
             <a href="https://www.euglena.jp/" target="_blank">
-                <img class="sponsor-img" src="https://www.euglena.jp/wp_01/wp-content/uploads/2023/10/efd456796c829c131a17e6e6526cbc82.png" alt="ユーグレナ">
+                <img class="sponsor-img" src="https://www.euglena.jp/wp_01/wp-content/uploads/2023/10/efd456796c829c131a17e6e6526cbc82.png" alt="Euglena">
             </a>
         </div>
     </footer>
 </div>
 
 <script>
-    // ======================= 多言語データ =======================
+    // ======================= 多言語データ（全11島）=======================
     const islandsData = {
+        // メイン2島
         ishigaki: { id: "ishigaki", name: { en: "Ishigaki Island", it: "Ishigaki", ru: "Исигаки", ja: "石垣島" }, mainImage: "https://ishigaki-tours.com/wp-content/uploads/2018/01/313-3.jpg", mapImage: "https://www.samuraitours.com/wp-content/uploads/2020/05/e_top_map.gif", officialLink: "https://visitokinawa.jp/", 
-            desc: { en: "Gateway to the Yaeyama archipelago with stunning nature.", it: "Porta dell'arcipelago Yaeyama.", ru: "Ворота в архипелаг Яэяма.", ja: "八重山諸島の玄関口。豊かな自然と文化。" },
-            access: { en: "New Ishigaki Airport. Flights from Tokyo, Osaka, Naha.", it: "Aeroporto di Ishigaki.", ru: "Аэропорт Новый Исигаки.", ja: "新石垣空港。東京・大阪・那覇から便あり。" },
-            sights: { en: "Kabira Bay, Yonehara Beach, Stalactite Cave.", it: "Baia Kabira, Spiaggia Yonehara.", ru: "Бухта Кабира, пляж Йонехара.", ja: "カビラ湾、米原ビーチ、鍾乳洞。" },
+            desc: { en: "Gateway to the Yaeyama archipelago with stunning nature.", it: "Porta dell'arcipelago Yaeyama con natura mozzafiato.", ru: "Ворота в архипелаг Яэяма с потрясающей природой.", ja: "八重山諸島の玄関口。素晴らしい自然と文化。" },
+            access: { en: "New Ishigaki Airport. Flights from Tokyo, Osaka, Naha.", it: "Aeroporto di Ishigaki. Voli da Tokyo, Osaka, Naha.", ru: "Аэропорт Новый Исигаки. Рейсы из Токио, Осаки, Наха.", ja: "新石垣空港。東京・大阪・那覇から便あり。" },
+            sights: { en: "Kabira Bay, Yonehara Beach, Stalactite Cave, Mt. Omoto.", it: "Baia Kabira, Spiaggia Yonehara, Grotta Stalattite, Monte Omoto.", ru: "Бухта Кабира, пляж Йонехара, сталактитовая пещера, гора Омото.", ja: "カビラ湾、米原ビーチ、鍾乳洞、於茂登岳。" },
             tips: { en: "Rent a car recommended. Best season March–October.", it: "Noleggia un'auto. Stagione migliore marzo-ottobre.", ru: "Арендуйте авто. Лучший сезон март-октябрь.", ja: "レンタカーが便利。ベストシーズン3〜10月。" } },
         miyako: { id: "miyako", name: { en: "Miyako Island", it: "Miyako", ru: "Мияко", ja: "宮古島" }, mainImage: "https://www.veltra.com/jp/guide/wp-content/uploads/2023/10/pixta_39456562_M-min.jpg", mapImage: "https://i0.wp.com/perfect47japan.com/wp-content/uploads/2023/06/Glory-Island-33.jpg?resize=1024%2C683&ssl=1", officialLink: "https://www.miyakotravel.jp/",
-            desc: { en: "Famous for white sand beaches and crystal clear waters.", it: "Famosa per spiagge di sabbia bianca.", ru: "Известен белыми пляжами.", ja: "白い砂浜と透き通った海で有名。" },
+            desc: { en: "Famous for white sand beaches and crystal clear waters.", it: "Famosa per spiagge di sabbia bianca e acque cristalline.", ru: "Известен белыми пляжами и кристально чистой водой.", ja: "白い砂浜と透き通った海で有名。" },
             access: { en: "Miyako Airport. Car rental recommended.", it: "Aeroporto di Miyako. Auto consigliata.", ru: "Аэропорт Мияко. Рекомендуется аренда авто.", ja: "宮古空港。レンタカー推奨。" },
-            sights: { en: "Maehama Beach, Sunayama Beach, Irabu Bridge.", it: "Spiaggia Maehama, Ponte Irabu.", ru: "Пляж Маэхама, мост Ирабу.", ja: "前浜ビーチ、砂山ビーチ、伊良部大橋。" },
-            tips: { en: "Snorkeling gear rental available. Best April–October.", it: "Attrezzatura snorkeling. Meglio aprile-ottobre.", ru: "Снаряжение для снорклинга. Лучший апрель-октябрь.", ja: "シュノーケリング道具レンタルあり。4～10月がおすすめ。" } },
+            sights: { en: "Maehama Beach, Sunayama Beach, Irabu Bridge, Cape Higashi-Hennazaki.", it: "Spiaggia Maehama, Spiaggia Sunayama, Ponte Irabu, Capo Higashi.", ru: "Пляж Маэхама, пляж Сунаяма, мост Ирабу, мыс Хигаси.", ja: "前浜ビーチ、砂山ビーチ、伊良部大橋、東平安名崎。" },
+            tips: { en: "Snorkeling gear rental. Best April–October.", it: "Attrezzatura snorkeling. Meglio aprile-ottobre.", ru: "Снаряжение для снорклинга. Лучший апрель-октябрь.", ja: "シュノーケリング道具レンタルあり。4〜10月がおすすめ。" } },
         // 八重山周辺5島
         iriomote: { id: "iriomote", name: { en: "Iriomote Island", it: "Iriomote", ru: "Ириомоте", ja: "西表島" }, mainImage: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800&h=450&fit=crop", officialLink: "https://visitokinawa.jp/",
-            desc: { en: "90% jungle, home to Iriomote wildcats.", it: "Giungla, gatti selvatici.", ru: "90% джунгли, дикие кошки.", ja: "島の90％がジャングル。西表ヤマネコ。" },
-            access: { en: "Ferry from Ishigaki to Ohara/Uehara port.", it: "Traghetto da Ishigaki.", ru: "Паром из Исигаки.", ja: "石垣島から大原港または上原港へフェリー。" },
+            desc: { en: "90% jungle, home to Iriomote wildcats.", it: "Giungla, gatti selvatici di Iriomote.", ru: "90% джунгли, дикие кошки Ириомоте.", ja: "島の90％がジャングル。西表ヤマネコ。" },
+            access: { en: "Ferry from Ishigaki to Ohara/Uehara port.", it: "Traghetto da Ishigaki ai porti Ohara/Uehara.", ru: "Паром из Исигаки до порта Охара/Уэхара.", ja: "石垣島から大原港または上原港へフェリー。" },
             sights: { en: "Pinaisara Falls, Mangrove cruise.", it: "Cascate Pinaisara, Crociera mangrovie.", ru: "Водопад Пинайсара, мангровый круиз.", ja: "ピナイサーラの滝、マングローブクルーズ。" },
             tips: { en: "Join guided tours for jungle trekking.", it: "Tour guidati per trekking.", ru: "Экскурсии с гидом.", ja: "ジャングルトレッキングはガイドツアーが安心。" } },
         taketomi: { id: "taketomi", name: { en: "Taketomi Island", it: "Taketomi", ru: "Такетоми", ja: "竹富島" }, mainImage: "https://images.pexels.com/photos/2340973/pexels-photo-2340973.jpeg?w=800&h=450&fit=crop", officialLink: "https://visitokinawa.jp/",
-            desc: { en: "Traditional Ryukyu village, star-sand beaches.", it: "Villaggio Ryukyu, spiagge di sabbia stellata.", ru: "Традиционная деревня Рюкю, звездный песок.", ja: "伝統的な琉球の町並み、星砂の浜。" },
+            desc: { en: "Traditional Ryukyu village, star-sand beaches.", it: "Villaggio Ryukyu tradizionale, spiagge di sabbia stellata.", ru: "Традиционная деревня Рюкю, звездный песок.", ja: "伝統的な琉球の町並み、星砂の浜。" },
             access: { en: "10-15 min ferry from Ishigaki.", it: "Traghetto 10-15 min da Ishigaki.", ru: "Паром 10-15 минут от Исигаки.", ja: "石垣島から高速フェリーで10〜15分。" },
-            sights: { en: "Kondoi Beach, Star Sand, Ryukyu houses.", it: "Spiaggia Kondoi, Sabbia stellata.", ru: "Пляж Кондой, звездный песок.", ja: "コンドイ浜、星砂の浜、琉球家屋。" },
+            sights: { en: "Kondoi Beach, Star Sand, Ryukyu houses.", it: "Spiaggia Kondoi, Sabbia stellata, case Ryukyu.", ru: "Пляж Кондой, звездный песок, дома Рюкю.", ja: "コンドイ浜、星砂の浜、琉球家屋。" },
             tips: { en: "Rent a bicycle to explore.", it: "Noleggia bicicletta.", ru: "Арендуйте велосипед.", ja: "レンタサイクルで巡ろう。" } },
         kohama: { id: "kohama", name: { en: "Kohama Island", it: "Kohama", ru: "Кохама", ja: "小浜島" }, mainImage: "https://images.pexels.com/photos/457882/pexels-photo-457882.jpeg?w=800&h=450&fit=crop", officialLink: "https://visitokinawa.jp/",
-            desc: { en: "Sugarcane fields, known for 'Churasan' drama.", it: "Campi di canna da zucchero, famosa per drama.", ru: "Поля сахарного тростника, известно дорамой.", ja: "さとうきび畑。『ちゅらさん』で有名。" },
+            desc: { en: "Sugarcane fields, known for 'Churasan' drama.", it: "Campi di canna da zucchero, famosa per drama 'Churasan'.", ru: "Поля сахарного тростника, известно дорамой 'Churasan'.", ja: "さとうきび畑。『ちゅらさん』で有名。" },
             access: { en: "Ferry from Ishigaki (25 min).", it: "Traghetto da Ishigaki 25 min.", ru: "Паром из Исигаки, 25 минут.", ja: "石垣島からフェリー約25分。" },
-            sights: { en: "Ufudake Viewpoint, Sugar Road.", it: "Belvedere Ufudake.", ru: "Смотровая Уфудаке.", ja: "ウフダケ展望台、シュガーロード。" },
+            sights: { en: "Ufudake Viewpoint, Sugar Road.", it: "Belvedere Ufudake, Strada dello zucchero.", ru: "Смотровая Уфудаке, Сахарная дорога.", ja: "ウフダケ展望台、シュガーロード。" },
             tips: { en: "Try local sugarcane soft cream.", it: "Prova gelato canna da zucchero.", ru: "Попробуйте местное мороженое.", ja: "さとうきびソフトクリームを。" } },
         kuro: { id: "kuro", name: { en: "Kuro Island", it: "Kuro", ru: "Куро", ja: "黒島" }, mainImage: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&h=450&fit=crop", officialLink: "https://visitokinawa.jp/",
-            desc: { en: "Cattle farming and heart-shaped rock.", it: "Allevamento bovino e roccia a cuore.", ru: "Скотоводство и скала Сердце.", ja: "牛の島。ハートロック。" },
+            desc: { en: "Cattle farming and heart-shaped rock.", it: "Allevamento bovino e roccia a forma di cuore.", ru: "Скотоводство и скала Сердце.", ja: "牛の島。ハートロック。" },
             access: { en: "Ferry from Ishigaki (30 min).", it: "Traghetto 30 min da Ishigaki.", ru: "Паром 30 минут от Исигаки.", ja: "石垣島からフェリー約30分。" },
             sights: { en: "Heart Rock, Kuroshima Observatory.", it: "Roccia a cuore, osservatorio.", ru: "Скала Сердце, обсерватория.", ja: "ハートロック、黒島展望台。" },
             tips: { en: "Rent electric bicycle.", it: "Bicicletta elettrica.", ru: "Электровелосипед.", ja: "電動レンタサイクルで一周。" } },
         hatoma: { id: "hatoma", name: { en: "Hatoma Island", it: "Hatoma", ru: "Хатома", ja: "鳩間島" }, mainImage: "https://images.pexels.com/photos/1618606/pexels-photo-1618606.jpeg?w=800&h=450&fit=crop", officialLink: "https://visitokinawa.jp/",
-            desc: { en: "Tiny remote island, snorkeling & stargazing.", it: "Piccola remota, snorkeling e stelle.", ru: "Маленький отдаленный, снорклинг и звезды.", ja: "小さな離島。シュノーケリングと星空。" },
+            desc: { en: "Tiny remote island, snorkeling & stargazing.", it: "Piccola isola remota, snorkeling e osservazione stelle.", ru: "Маленький отдаленный остров, снорклинг и звезды.", ja: "小さな離島。シュノーケリングと星空。" },
             access: { en: "Ferry from Ishigaki or Iriomote.", it: "Traghetto da Ishigaki o Iriomote.", ru: "Паром из Исигаки или Ириомоте.", ja: "石垣島・西表島からフェリー。" },
             sights: { en: "Hatoma Beach, Nakamoto Village.", it: "Spiaggia Hatoma, villaggio Nakamoto.", ru: "Пляж Хатома, деревня Накамото.", ja: "鳩間ビーチ、仲本集落。" },
             tips: { en: "Very limited shops; bring supplies.", it: "Negozi limitati, porta rifornimenti.", ru: "Магазинов мало, имейте запасы.", ja: "売店が少ないので注意。" } },
         // 宮古周辺4島
         irabu: { id: "irabu", name: { en: "Irabu Island", it: "Irabu", ru: "Ирабу", ja: "伊良部島" }, mainImage: "https://images.pexels.com/photos/1283819/pexels-photo-1283819.jpeg?w=800&h=450&fit=crop", officialLink: "https://www.miyakotravel.jp/",
-            desc: { en: "Connected by Irabu bridge, cliffs & natural pools.", it: "Ponte Irabu, scogliere e piscine naturali.", ru: "Мост Ирабу, скалы и природные бассейны.", ja: "伊良部大橋で接続。絶壁と天然プール。" },
+            desc: { en: "Connected by Irabu bridge, cliffs & natural pools.", it: "Collegato dal ponte Irabu, scogliere e piscine naturali.", ru: "Соединен мостом Ирабу, скалы и природные бассейны.", ja: "伊良部大橋で接続。絶壁と天然プール。" },
             access: { en: "Drive across Irabu Bridge from Miyako.", it: "Ponte Irabu in auto.", ru: "Автомобильный мост Ирабу.", ja: "宮古島から車で伊良部大橋。" },
             sights: { en: "Toriike Pond, Sawada Beach.", it: "Stagno Toriike, spiaggia Sawada.", ru: "Пруд Ториикэ, пляж Савада.", ja: "通り池、佐和田ビーチ。" },
             tips: { en: "Explore rock pools at low tide.", it: "Piscine rocciose con bassa marea.", ru: "Исследуйте бассейны в отлив.", ja: "干潮時に潮だまりを探検。" } },
@@ -274,8 +280,8 @@
             sights: { en: "Ikema Bridge view, Funakusu Beach.", it: "Vista ponte, spiaggia Funakusu.", ru: "Мост Икема, пляж Фунакусу.", ja: "池間大橋の眺め、フナクス浜。" },
             tips: { en: "Sunset at the bridge is spectacular.", it: "Tramonto spettacolare.", ru: "Закат на мосту впечатляет.", ja: "橋からの夕日が絶景。" } },
         kurima: { id: "kurima", name: { en: "Kurima Island", it: "Kurima", ru: "Курима", ja: "来間島" }, mainImage: "https://images.pexels.com/photos/2506927/pexels-photo-2506927.jpeg?w=800&h=450&fit=crop", officialLink: "https://www.miyakotravel.jp/",
-            desc: { en: "Rural island, Kurima bridge view.", it: "Isole rurale, ponte Kurima.", ru: "Сельский остров, мост Курима.", ja: "のどかな農村島。来間大橋の眺め。" },
-            access: { en: "Kurima Bridge from Miyako (5 min drive).", it: "Ponte Kurima da Miyako.", ru: "Мост Курима.", ja: "宮古島から来間大橋（車で5分）。" },
+            desc: { en: "Rural island, Kurima bridge view.", it: "Isola rurale, vista ponte Kurima.", ru: "Сельский остров, вид на мост Курима.", ja: "のどかな農村島。来間大橋の眺め。" },
+            access: { en: "Kurima Bridge from Miyako (5 min drive).", it: "Ponte Kurima da Miyako (5 min in auto).", ru: "Мост Курима от Мияко (5 минут на машине).", ja: "宮古島から来間大橋（車で5分）。" },
             sights: { en: "Nagamahama Beach, Ryugujo Observatory.", it: "Spiaggia Nagamahama, osservatorio Ryugujo.", ru: "Пляж Нагамахама, обсерватория Рюгудзё.", ja: "長間浜、竜宮城展望台。" },
             tips: { en: "Quiet, best for cycling.", it: "Tranquilla, ottima per bicicletta.", ru: "Тихий, хорошо для велосипеда.", ja: "静かな島。サイクリングに最適。" } }
     };
@@ -427,7 +433,7 @@
     }
 
     // 初期化
-    function initApp() {
+    function init() {
         const savedLang = localStorage.getItem('appLang') || 'en';
         const savedTheme = localStorage.getItem('appTheme') || 'dark';
         currentLang = savedLang;
@@ -445,14 +451,14 @@
             updateThemeUI();
         });
     }
-    initApp();
+    init();
 
-    // Service Worker 登録（シンプル）
+    // Service Worker 登録（PWA）
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js').then(reg => {
-            console.log('Service Worker 登録成功:', reg);
+        navigator.serviceWorker.register('/sw.js').then(reg => {
+            console.log('Service Worker registered:', reg);
         }).catch(err => {
-            console.log('Service Worker 登録失敗:', err);
+            console.log('Service Worker registration failed:', err);
         });
     }
 </script>
