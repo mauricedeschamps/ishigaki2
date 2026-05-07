@@ -1,10 +1,10 @@
 const CACHE_NAME = 'island-guide-v1';
 const urlsToCache = [
   '/',
-  'index.html',
-  'manifest.json',
-  'icons/icon-192.jpg',
-  'icons/icon-512.jpg'
+  '/index.html',
+  '/manifest.json',
+  '/icons/icon-192.jpg',
+  '/icons/icon-512.jpg'
 ];
 
 self.addEventListener('install', event => {
@@ -22,7 +22,7 @@ self.addEventListener('fetch', event => {
       if (event.request.mode === 'navigate') {
         return caches.match('/index.html');
       }
-      return new Response('オフライン', { status: 404 });
+      return new Response('Offline content not available', { status: 404 });
     })
   );
 });
